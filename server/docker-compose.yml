@@ -1,10 +1,31 @@
 services:
-  upload-sink:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL:-you@example.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "8080:8080"
+      - "${TRAEFIK_HTTPS_PORT:-443}:443"
+    volumes:
+      - "letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: unless-stopped
+
+  upload-sink:
+    image: ghcr.io/salberternst/speedtest:latest
     environment:
       PORT: "8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.upload-sink.rule=Host(`${TRAEFIK_HOST:-yourdomain.com}`)"
+      - "traefik.http.routers.upload-sink.entrypoints=websecure"
+      - "traefik.http.routers.upload-sink.tls.certresolver=letsencrypt"
+      - "traefik.http.services.upload-sink.loadbalancer.server.port=8080"
     restart: unless-stopped
+
+volumes:
+  letsencrypt:
