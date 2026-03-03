@@ -6,8 +6,15 @@ ENV PYTHONUNBUFFERED=1 \
     CHUNK_SIZE=65536 \
     MAX_BODY_BYTES=0
 
+RUN addgroup --system app \
+    && adduser --system --ingroup app --home /app --no-create-home app \
+    && mkdir -p /app \
+    && chown -R app:app /app
+
 WORKDIR /app
-COPY app.py /app/app.py
+COPY --chown=app:app app.py /app/app.py
+
+USER app
 
 EXPOSE 8080
 
