@@ -17,7 +17,10 @@ import threading
 import time
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from urllib.parse import urlparse
+
+from report_to_html import render_html
 
 
 @dataclass
@@ -376,7 +379,15 @@ def run_full_test(args):
         report_name = make_report_filename(results["timestamp"])
         with open(report_name, "w") as f:
             json.dump(results, f, indent=2, default=str)
-        print(f"\n  Report saved to: {report_name}")
+        print(f"\n  JSON report saved to: {report_name}")
+
+        html_name = str(Path(report_name).with_suffix(".html"))
+        try:
+            html_content = render_html(results, Path(report_name).name)
+            Path(html_name).write_text(html_content, encoding="utf-8")
+            print(f"  HTML report saved to: {html_name}")
+        except Exception as e:
+            print(f"  HTML report generation failed: {e}")
 
     print()
     return results
@@ -421,7 +432,7 @@ Examples:
                                           Limit upload to 5 Mbps
   python3 speedtest.py --skip-upload       Skip upload test
   python3 speedtest.py --upload-endpoint https://speed.cloudflare.com/__up --report
-                                          Save JSON report to timestamp filename
+                                          Save JSON + HTML report to timestamp filename
   python3 speedtest.py --upload-endpoint https://speed.cloudflare.com/__up --repeat 5 --interval 60
                                           Run 5 times, 60s apart
   python3 speedtest.py --upload-endpoint https://speed.cloudflare.com/__up --insecure
@@ -449,7 +460,9 @@ Examples:
         help="Limit upload bandwidth in Mbps (e.g. 5 for 5 Mbps)",
     )
     parser.add_argument(
-        "--report", action="store_true", help="Save JSON report to <timestamp>.json"
+        "--report",
+        action="store_true",
+        help="Save JSON + HTML reports to <timestamp>.json/.html",
     )
     parser.add_argument(
         "--repeat",

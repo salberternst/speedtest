@@ -4,7 +4,8 @@ Small toolkit for diagnosing unstable network behavior at work or home.
 
 ## Included
 
-- `speedtest.py`: HTTP upload test with live latency sampling and JSON reports.
+- `speedtest.py`: HTTP upload test with live latency sampling and JSON + HTML reports.
+- `report_to_html.py`: Convert a JSON report into a self-contained interactive HTML plot.
 - `server/`: Minimal Python upload sink (`/up`, `/health`) plus Dockerfile for self-hosting.
 
 ## Quick Start
@@ -14,6 +15,8 @@ python3 speedtest.py --upload-endpoint https://speed.cloudflare.com/__up --repor
 python3 speedtest.py --upload-endpoint http://127.0.0.1:8080/up --upload-size 40 --upload-limit 1 --report
 ```
 
+`--report` now exports both `<timestamp>.json` and `<timestamp>.html`.
+
 ## Run the Test Server
 
 ```bash
@@ -22,6 +25,14 @@ docker compose up --build
 ```
 
 Then point `speedtest.py` upload endpoint to your own server URL.
+
+## Interactive Report Plot
+
+```bash
+python3 report_to_html.py 2026-03-03_11-36-52.json
+```
+
+This writes `2026-03-03_11-36-52.html` next to the JSON file. You can open it by double-clicking the HTML file in your file manager.
 
 ## Notes
 
