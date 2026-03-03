@@ -35,6 +35,9 @@ docker compose -f docker-compose.yml -f docker-compose.override.yml up --build
 - `TRAEFIK_HOST`: domain Traefik should route to (for example `speedtest.example.com`)
 - `TRAEFIK_ACME_EMAIL`: email used for Let's Encrypt registration
 - `TRAEFIK_HTTPS_PORT`: optional host-side HTTPS port (default `443`)
+- `TRAEFIK_READ_TIMEOUT`: max time Traefik reads request (body) from client (default `10m`)
+- `TRAEFIK_WRITE_TIMEOUT`: max time Traefik writes response to client (default `10m`)
+- `TRAEFIK_IDLE_TIMEOUT`: keep-alive idle timeout (default `10m`)
 
 ## Quick test
 
