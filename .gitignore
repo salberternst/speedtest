@@ -178,3 +178,5 @@ pyrightconfig.json
 *.json
 
 *.html
+
+.DS_Store
